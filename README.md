@@ -1,4 +1,4 @@
-# Tic Tac Toe (Java Console Game)
+/* # Tic Tac Toe (Java Console Game) */
 
 This is a simple 2-player Tic Tac Toe game written in Java. It runs in the console and allows two users to take turns playing.
 
