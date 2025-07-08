@@ -1,66 +1,96 @@
 import java.util.Scanner;
 
 public class TicTacToe {
-    static char[][] board = new char[3][3];
-    static char current = 'X';
+    static char[][] board = {
+        {' ', '|', ' ', '|', ' '},
+        {'-', '+', '-', '+', '-'},
+        {' ', '|', ' ', '|', ' '},
+        {'-', '+', '-', '+', '-'},
+        {' ', '|', ' ', '|', ' '}
+    };
+    
+    static char currentPlayer = 'X';
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        initBoard();
+        Scanner scanner = new Scanner(System.in);
+        boolean gameEnded = false;
 
-        while (true) {
-            printBoard();
-            System.out.print("Player " + current + " turn (row[1-3] col[1-3]): ");
-            int r = sc.nextInt() - 1, c = sc.nextInt() - 1;
+        printBoard();
 
-            if (r < 0 || r > 2 || c < 0 || c > 2 || board[r][c] != ' ') {
-                System.out.println("Invalid move. Try again.");
-                continue;
-            }
+        while (!gameEnded) {
+            System.out.println("Player " + currentPlayer + ", enter your move (row [1-3] and column [1-3]):");
+            int row = scanner.nextInt() - 1;
+            int col = scanner.nextInt() - 1;
 
-            board[r][c] = current;
-            if (checkWin()) {
+            if (isValidMove(row, col)) {
+                placeMove(row, col);
                 printBoard();
-                System.out.println("Player " + current + " wins!");
-                break;
+
+                if (checkWin()) {
+                    System.out.println("Player " + currentPlayer + " wins!");
+                    gameEnded = true;
+                } else if (isDraw()) {
+                    System.out.println("It's a draw!");
+                    gameEnded = true;
+                } else {
+                    switchPlayer();
+                }
+            } else {
+                System.out.println("This move is invalid. Try again.");
             }
-            if (isDraw()) {
-                printBoard();
-                System.out.println("It's a draw!");
-                break;
-            }
-            current = (current == 'X') ? 'O' : 'X';
         }
-    }
 
-    static void initBoard() {
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                board[i][j] = ' ';
+        scanner.close();
     }
 
     static void printBoard() {
-        System.out.println("---------");
         for (char[] row : board) {
-            for (char c : row) System.out.print("|" + c);
-            System.out.println("|");
+            for (char ch : row) {
+                System.out.print(ch);
+            }
+            System.out.println();
         }
-        System.out.println("---------");
+    }
+
+    static boolean isValidMove(int row, int col) {
+        int boardRow = row * 2;
+        int boardCol = col * 2;
+
+        return boardRow < 5 && boardCol < 5 && board[boardRow][boardCol] == ' ';
+    }
+
+    static void placeMove(int row, int col) {
+        int boardRow = row * 2;
+        int boardCol = col * 2;
+        board[boardRow][boardCol] = currentPlayer;
+    }
+
+    static void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 
     static boolean checkWin() {
-        for (int i = 0; i < 3; i++)
-            if ((board[i][0] == current && board[i][1] == current && board[i][2] == current) ||
-                (board[0][i] == current && board[1][i] == current && board[2][i] == current))
-                return true;
-        return (board[0][0] == current && board[1][1] == current && board[2][2] == current) ||
-               (board[0][2] == current && board[1][1] == current && board[2][0] == current);
+        // Rows and columns
+        for (int i = 0; i < 3; i++) {
+            if (checkLine(i, 0, i, 1, i, 2) || checkLine(0, i, 1, i, 2, i)) return true;
+        }
+        // Diagonals
+        return checkLine(0, 0, 1, 1, 2, 2) || checkLine(0, 2, 1, 1, 2, 0);
+    }
+
+    static boolean checkLine(int r1, int c1, int r2, int c2, int r3, int c3) {
+        char a = board[r1 * 2][c1 * 2];
+        char b = board[r2 * 2][c2 * 2];
+        char c = board[r3 * 2][c3 * 2];
+        return a == currentPlayer && a == b && b == c;
     }
 
     static boolean isDraw() {
-        for (char[] row : board)
-            for (char c : row)
-                if (c == ' ') return false;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i * 2][j * 2] == ' ') return false;
+            }
+        }
         return true;
     }
 }
